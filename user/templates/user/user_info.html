@@ -1,0 +1,421 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block title %}
+    个人信息
+{% endblock title %}
+
+{% block head %}
+    {% load static %}
+    {% comment %} bootstrap-datepicker的样式 {% endcomment %}
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap-datepicker3.min.css' %}">
+    {% comment %} <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker3.min.css"> {% endcomment %}
+    {% comment %} 引入jQuery {% endcomment %}
+    <script src="{% static 'bootstrap/jquery-3.6.0.min.js' %}"></script>
+    {% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> {% endcomment %}
+    {% comment %} 引入moment.js {% endcomment %}
+    <script src="{% static 'bootstrap/moment.js' %}"></script>
+    {% comment %} <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script> {% endcomment %}
+    {% comment %} 引入bootstrap-datepicker插件 {% endcomment %}
+    <script src="{% static 'bootstrap/bootstrap-datepicker.min.js' %}"></script>
+    {% comment %} <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script> {% endcomment %}
+    {% comment %} 引入bootstrap-datepicker中文插件 {% endcomment %}
+    <script src="{% static 'bootstrap/bootstrap-datepicker.zh-CN.min.js' %}"></script>
+    {% comment %} <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.zh-CN.min.js"></script> {% endcomment %}
+    {% comment %} 引入crypto-js加密模块 {% endcomment %}
+    {% comment %} <script src="{% static 'bootstrap/crypto-js.min.js' %}"></script> {% endcomment %}
+    {% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" integrity="sha512-E8QSvWZ0eCLGk4km3hxSsNmGWbLtSCSUcewDQPQWZF6pEU8GlT8a5fF32wOl1i8ftdMhssTrF/OhyGWwonTcXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> {% endcomment %}
+{% endblock head %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col mt-4" >
+                <h2 class="mb-3" style="color: rgb(17, 189, 189);">
+                    基本信息
+                </h2>
+                <hr>
+                <div class="mb-3" style="text-indent: 1em;">
+                    <p><font class="fs-5 text-break">邮箱: </font><font class="fs-6 text-break">{{ request.user.email }}<button type="button" class="btn btn-link btn-sm" data-bs-toggle="modal" data-bs-target="#emailModal">更改</button></font></p>
+                    <p><font class="fs-5 text-break">用户名: </font><font class="fs-6 text-break">{{ request.user.username }}<button type="button" class="btn btn-link btn-sm" data-bs-toggle="modal" data-bs-target="#usernameModal">更改</button></font></p>
+                    <p><font class="fs-5 text-break">性别: </font><font class="fs-6 text-break">{{ request.user.sex }}<button type="button" class="btn btn-link btn-sm" data-bs-toggle="modal" data-bs-target="#sexModal">更改</button></font></p>
+                    <p><font class="fs-5 text-break">生日: </font><font class="fs-6 text-break">{% if request.user.birthday == '' %}尚未填写{% else %}{{ request.user.birthday }}{% endif %}<button type="button" class="btn btn-link btn-sm" data-bs-toggle="modal" data-bs-target="#birthdayModal">更改</button></font></p>
+                    <p><font class="fs-5 text-break">报到时间: </font><font class="fs-6 text-break">{{ request.user.registration_to_school }}</font></p>
+                    <p><font class="fs-5 text-break">校区: </font><font class="fs-6 text-break">
+                    {% if request.user.campus == 'haizhu' %}
+                    海珠校区
+                    {% elif request.user.campus == 'baiyun' %}
+                    白云校区
+                    {% endif %}
+                    </font></p>
+                    <p><font class="fs-5 text-break">宿舍: </font><font class="fs-6 text-break">{{ request.user.dormitoryA }}{{ request.user.dormitoryB }}</font></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="emailModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="emailModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">更改邮箱</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'user:changeInfo' %}" class="row g-3 justify-content-start" id="emailForm" method="post">
+                        {% csrf_token %}
+                        <div class="col-12">
+                            <label for="email" class="visually-hidden">新邮箱地址</label>
+                            <input type="email" class="form-control" name="email" id="email" placeholder="新邮箱地址">
+                        </div>
+                        <div class="col-8">
+                            <label for="getCode" class="visually-hidden">获取验证码</label>
+                            <input type="text" class="form-control" name="getCode" id="getCode" placeholder="验证码">
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-primary mb-3" id="sendCode" onclick="sendEmailCode()">获取验证码</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" onclick="emailFormSubmit()">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="usernameModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="usernameModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabelUsername">更改用户名</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 justify-content-start">
+                        <div class="col-12">
+                            <label for="email" class="visually-hidden">新用户名</label>
+                            <input type="email" class="form-control" name="username" id="username" placeholder="新用户名">
+                        </div>
+                        <div class="col-12">
+                            <div id="usernameTips" class="form-text"></div>
+                            <div id="userName" class="form-text">用户名长度范围为1~15，并且不能含有空格。</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" onclick="usernameFormSubmit()">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="sexModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="sexModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabelUsername">修改显示的性别</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 justify-content-start">
+                        <div class="col-12">
+                            <select class="form-select" id="sex" placeholder>
+                                <option selected>保密</option>
+                                <option>男</option>
+                                <option>女</option>
+                                <option>Others</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" onclick="sexSubmit()">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="birthdayModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="birthdayModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabelUsername">修改生日信息</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="birthday" placeholder readonly value="{% if request.user.birthday == '' %}尚未填写{% else %}{{ request.user.birthday }}{% endif %}">
+                        <label for="birthday" class="form-label">生日</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" onclick="birthdaySubmit()">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
+
+{% block js %}
+
+    let valElements = {
+        email: document.getElementById('email'),
+        sendCode: document.getElementById('sendCode'),
+        getCode: document.getElementById('getCode'),
+        username: document.getElementById('username'),
+        usernameTips: document.getElementById('usernameTips'),
+        sex: document.getElementById('sex'),
+        birthday: document.getElementById('birthday'),
+    }
+    let email_is_ok = false;
+    let check_duplicate = () => {
+        let xmlhttp;
+        {% comment %} 接受输入框内的值,然后将其转码以便传输 {% endcomment %}
+        let email = valElements.email.value;
+        email = encodeURIComponent(email);
+        {% comment %} ajax {% endcomment %}
+        if (window.XMLHttpRequest)
+        {
+          {% comment %} IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码 {% endcomment %}
+          xmlhttp=new XMLHttpRequest();
+        }
+        else
+        {
+          {% comment %} IE6, IE5 浏览器执行代码 {% endcomment %}
+          xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange=function()
+        {
+          if (xmlhttp.readyState==4 && (xmlhttp.status >= 200 && xmlhttp.status < 300)) {
+            valElements.email.classList.add('is-valid');
+            valElements.email.classList.remove('is-invalid');
+            email_is_ok = true;
+          } else {
+            valElements.email.classList.add('is-invalid');
+            email_is_ok = false;
+          }
+        }
+        xmlhttp.open("GET","{% url 'user:isduplicate' %}?email=" + email,true);
+        xmlhttp.send()
+    }
+
+    valElements.email.addEventListener('blur', function () {
+        let reg = /^([a-zA-Z]|[0-9])(\w|\-|\.)+@[a-zA-Z0-9]+(\.[a-zA-Z]{2,6}$)|(\.([a-zA-Z]{2,6})+\.([a-zA-Z]{2})$)/;
+        if(reg.test(valElements.email.value)) {
+            valElements.email.classList.remove('is-invalid');
+            email_is_ok = true;
+        } else {
+            valElements.email.classList.add('is-invalid');
+            email_is_ok = false;
+            return
+        }
+        check_duplicate()
+    })
+
+    let get_email_code = () => {
+        let xhr = new XMLHttpRequest();
+        let email_address = valElements.email.value;
+        xhr.open("GET", "{% url 'user:emailChangeCode' %}?uid={{ request.user.id }}&email=" + email_address);
+        xhr.send();
+        xhr.onreadystatechange = function() {
+            return
+        }
+    }
+
+    let time = 90
+    let sendEmailCode = () => {
+        if (time == 0 && email_is_ok) {
+            valElements.sendCode.removeAttribute("disabled");
+            valElements.sendCode.innerHTML = '获取验证码';
+            time = 90;
+        } else if (!email_is_ok) {
+            return
+        } else if (time == 90) {
+            get_email_code()
+            time--;
+            setTimeout(() => {
+                sendEmailCode()
+            }, 1000);
+        } else {
+            valElements.sendCode.setAttribute("disabled", true);
+            valElements.sendCode.innerHTML = "重新发送(" + time + ")";
+            time--;
+            setTimeout(() => {
+                sendEmailCode()
+            }, 1000);
+        }
+    }
+    let code_check = false
+    let check_email_code = () => {
+        let xhr = new XMLHttpRequest();
+        let code = valElements.getCode.value;
+        xhr.open("GET", "{% url 'user:emailChangeCode' %}?uid={{ request.user.id }}&getcode=" + code);
+        xhr.send();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    code_check = true;
+                } else if (xhr.status > 300) {
+                    code_check = false;
+                }
+            }
+            if (code_check) {
+                valElements.getCode.classList.remove('is-invalid');
+                valElements.getCode.classList.add('is-valid');
+            } else if (!code_check) {
+                valElements.getCode.classList.remove('is-valid');
+                valElements.getCode.classList.add('is-invalid');
+            }
+        }
+    }
+    valElements.getCode.addEventListener('blur', function () {
+        let code_str = valElements.getCode.value.split('');
+        if (code_str.length !== 8) {
+            valElements.getCode.classList.add('is-invalid');
+            return
+        }
+        check_email_code()
+    })
+
+    let emailFormSubmit = () => {
+        if (code_check && email_is_ok) {
+            document.getElementById('emailForm').submit();
+        } else {
+            return
+        }
+    }
+
+    let username_is_ok = false
+    let check_username = () => {
+        let xmlhttp;
+        {% comment %} 接受输入框内的值,然后将其转码以便传输 {% endcomment %}
+        let username = valElements.username.value;
+        username = encodeURIComponent(username);
+        {% comment %} ajax {% endcomment %}
+        if (window.XMLHttpRequest)
+        {
+            {% comment %} IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码 {% endcomment %}
+            xmlhttp=new XMLHttpRequest();
+        }
+        else
+        {
+            {% comment %} IE6, IE5 浏览器执行代码 {% endcomment %}
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange=function()
+        {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 404) {
+            valElements.usernameTips.innerText = '用户名已存在'
+            valElements.username.classList.add('is-invalid');
+            valElements.usernameTips.classList.add('text-danger')
+            username_is_ok = false
+            } else if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+            valElements.username.classList.add('is-valid');
+            valElements.usernameTips.innerText = '该用户名可以使用'
+            valElements.username.classList.remove('is-invalid');
+            valElements.usernameTips.classList.remove('text-danger')
+            valElements.usernameTips.classList.add('text-success')
+            username_is_ok = true
+            }
+        }
+        xmlhttp.open("GET","{% url 'user:isduplicate' %}?username=" + username,true);
+        xmlhttp.send();
+    }
+    {% comment %} 验证用户名格式是否正确 {% endcomment %}
+    valElements.username.addEventListener('blur', function () {
+        {% comment %} 添加一个验证成功的样式 {% endcomment %}
+        valElements.username.classList.add('is-valid');
+        {% comment %} 判断用户名是否含有空格 {% endcomment %}
+        let username_str = valElements.username.value.split('');
+        for (let i = 0; i < username_str.length; i++) {
+            if (username_str[i].trim() == '' || username_str[i].trim() == null) {
+                {% comment %} 添加一个验证失败的样式 {% endcomment %}
+                valElements.username.classList.add('is-invalid');
+                return
+            }
+            {% comment %} 循环到最后一次时，删除is-invalid样式，虽然不用if直接写也可以，但是还是以防万一 {% endcomment %}
+            if (i == username_str.length - 1) {
+                valElements.username.classList.remove('is-invalid');
+            }
+        }
+        {% comment %} 判断密码是否超过15个字符串，添加样式 {% endcomment %}
+        if (username_str.length > 15) {
+            valElements.username.classList.add('is-invalid');
+            return
+        }
+        if (!username_str.length) {
+            valElements.username.classList.add('is-invalid');
+            valElements.usernameTips.innerText = ''
+            valElements.usernameTips.classList.remove('text-danger')
+            valElements.usernameTips.classList.remove('text-success')
+            return
+        }
+        check_username()
+    })
+    
+    let usernameFormSubmit = () => {
+        if (username_is_ok) {
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "{% url 'user:changeInfo' %}");
+            {% comment %} 把csrf_token写到请求头中, 避免csrf攻击 {% endcomment %}
+            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            {% comment %} 将Content-Type设置为application/x-www-form-urlencoded,否则request.POST获取不到信息 {% endcomment %}
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            let PostData = `username=${valElements.username.value}`
+            xhr.send(PostData);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        location.reload();
+                    } else {
+                        valElements.usernameTips.innerText = '出现了意料之外的错误!'
+                        valElements.username.classList.add('is-invalid');
+                        valElements.usernameTips.classList.add('text-danger');
+                    }
+                }
+            }
+        }
+        valElements.username.classList.add('is-invalid');
+    }
+
+    let sexSubmit = () => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "{% url 'user:changeInfo' %}");
+        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        let PostData = `sex=${valElements.sex.value}`
+        xhr.send(PostData);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                location.reload();
+            }
+        }
+    }
+
+    {% comment %} 日期选择器 {% endcomment %}
+    $(document).ready(function(){
+        let nowDate = new Date();
+
+        $("#birthday").datepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            startDate: '1900-01-01',
+            endDate: moment().format('YYYY-MM-DD')
+        })
+    })
+
+    let birthdaySubmit = () => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "{% url 'user:changeInfo' %}");
+        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        let PostData = `birthday=${valElements.birthday.value}`
+        xhr.send(PostData);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                location.reload();
+            }
+        }
+    }
+{% endblock js %}

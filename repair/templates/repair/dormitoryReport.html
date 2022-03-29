@@ -1,0 +1,406 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}
+    宿舍报修
+{% endblock title %}
+    
+
+{% block body %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8">
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <button class="nav-link {% if request.user.campus == 'haizhu' %}active{% endif %}" id="nav-campus-haizhu-tab" data-bs-toggle="tab" data-bs-target="#nav-campus-haizhu" type="button" role="tab" aria-controls="nav-campus-haizhu" aria-selected="true">海珠校区宿舍报修</button>
+                        <button class="nav-link {% if request.user.campus == 'baiyun' %}active{% endif %}" id="nav-campus-baiyun-tab" data-bs-toggle="tab" data-bs-target="#nav-campus-baiyun" type="button" role="tab" aria-controls="nav-campus-baiyun" aria-selected="false">白云校区宿舍报修</button>
+                    </div>
+                </nav>
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade {% if request.user.campus == 'haizhu' %}show active{% endif %}" id="nav-campus-haizhu" role="tabpanel" aria-labelledby="nav-campus-haizhu-tab">
+                        {% if request.user.campus == 'haizhu' %}
+                        <form action="{% url 'repair:dormitory' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="campus" value="海珠校区">
+                            <div class="my-3">
+                                <label for="htitle" class="form-label">标题</label>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="htitle" aria-describedby="title" name="title">
+                                    <label for="htitle" id="htitle-label">0/30</label>
+                                </div>
+                            </div>
+                            <label for="hbuilding-radio-select" class="form-label mt-3">地点</label>
+                            <div class="mb-3">
+                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group" id='hbuilding-radio-select'>
+                                    <input type="radio" class="btn-check" name="buildingradio" id="hbuildingradio1" autocomplete="off" checked value="{{ request.user.dormitoryA }}">
+                                    <label class="btn btn-outline-secondary" for="hbuildingradio1">{{ request.user.dormitoryA }}</label>
+
+                                    <input type="radio" class="btn-check" name="buildingradio" id="hbuildingradio2" autocomplete="off" value="其它">
+                                    <label class="btn btn-outline-secondary" for="hbuildingradio2">其它(请在描述栏里说明)</label>
+                                </div>
+                            </div>
+                            
+                            <label for="hlevel-radio-select" class="form-label">宿舍号</label>
+                            <div class="mb-3">
+                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group" id='hnumber-radio-select'>
+                                    <input type="radio" class="btn-check" name="dormitoryNumber" id="hhnumber1" autocomplete="off" checked value="{{ request.user.dormitoryB }}">
+                                    <label class="btn btn-outline-secondary" for="hnumber1">{{ request.user.dormitoryB }}</label>
+
+                                    <input type="radio" class="btn-check" name="dormitoryNumber" id="hnumber2" autocomplete="off" value="0">
+                                    <label class="btn btn-outline-secondary" for="hnumber2">其它(请在描述栏里说明)</label>
+                                </div>
+                            </div>
+                            
+                            <label for="hlevel-radio-select" class="form-label">损害程度</label>
+                            <div class="mb-3">
+                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group" id='hlevel-radio-select'>
+                                    <input type="radio" class="btn-check" name="levelradio" id="hlevelradio1" autocomplete="off" checked value="低">
+                                    <label class="btn btn-outline-secondary" for="hlevelradio1">低</label>
+
+                                    <input type="radio" class="btn-check" name="levelradio" id="hlevelradio2" autocomplete="off" value="中">
+                                    <label class="btn btn-outline-secondary" for="hlevelradio2">中</label>
+
+                                    <input type="radio" class="btn-check" name="levelradio" id="hlevelradio3" autocomplete="off" value="高">
+                                    <label class="btn btn-outline-secondary" for="hlevelradio3">高</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="formFileMultiple" class="form-label" >一张现场照片(可选,仅支持jpg/jpeg/png/webp格式)</label>
+                                <input class="form-control" type="file" id="himage" name="picture">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="btext" class="form-label">描述(可选)</label>
+                                <div class="form-floating">
+                                    <textarea class="form-control" placeholder="Leave a comment here" id="htext" style="height: 100px" name="description"></textarea>
+                                    <label for="floatingTextarea2" id="htext-label">0/300</label>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="reset" class="btn btn-secondary" onclick="resetForm()">重置</button>
+                                <button type="submit" class="btn btn-primary" onclick="return hcheckNsubmit()">提交</button>
+                            </div>
+                        </form>
+                        {% else %}
+                        <form action="{% url 'repair:dormitory' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="campus" value="海珠校区">
+                            <div class="my-3">
+                                <label for="htitle" class="form-label">标题</label>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="htitle" aria-describedby="title" name="title">
+                                    <label for="htitle" id="htitle-label">0/30</label>
+                                </div>
+                            </div>
+                            <label for="hbuilding-radio-select" class="form-label mt-3">地点</label>
+                            <div class="mb-3">
+                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group" id='hbuilding-radio-select'>
+                                    <input type="radio" class="btn-check" name="buildingradio" id="hbuildingradio2" autocomplete="off" value="其它" checked>
+                                    <label class="btn btn-outline-secondary" for="hbuildingradio2">其它(请在描述栏里说明)</label>
+                                </div>
+                            </div>
+                            
+                            <label for="hlevel-radio-select" class="form-label">宿舍号</label>
+                            <div class="mb-3">
+                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group" id='hnumber-radio-select'>
+                                    <input type="radio" class="btn-check" name="dormitoryNumber" id="hnumber2" autocomplete="off" value="0" checked>
+                                    <label class="btn btn-outline-secondary" for="hnumber2">其它(请在描述栏里说明)</label>
+                                </div>
+                            </div>
+                            
+                            <label for="hlevel-radio-select" class="form-label">损害程度</label>
+                            <div class="mb-3">
+                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group" id='hlevel-radio-select'>
+                                    <input type="radio" class="btn-check" name="levelradio" id="hlevelradio1" autocomplete="off" checked value="低">
+                                    <label class="btn btn-outline-secondary" for="hlevelradio1">低</label>
+
+                                    <input type="radio" class="btn-check" name="levelradio" id="hlevelradio2" autocomplete="off" value="中">
+                                    <label class="btn btn-outline-secondary" for="hlevelradio2">中</label>
+
+                                    <input type="radio" class="btn-check" name="levelradio" id="hlevelradio3" autocomplete="off" value="高">
+                                    <label class="btn btn-outline-secondary" for="hlevelradio3">高</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="formFileMultiple" class="form-label" >一张现场照片(可选,仅支持jpg/jpeg/png/webp格式)</label>
+                                <input class="form-control" type="file" id="himage" name="picture">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="btext" class="form-label">描述(不少于15字)</label>
+                                <div class="form-floating">
+                                    <textarea class="form-control" placeholder="Leave a comment here" id="htext" style="height: 100px" name="description"></textarea>
+                                    <label for="floatingTextarea2" id="htext-label">0/300</label>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="reset" class="btn btn-secondary" onclick="resetForm()">重置</button>
+                                <button type="submit" class="btn btn-primary" onclick="return hcheckNsubmit()">提交</button>
+                            </div>
+                        </form>
+                        {% endif %}
+                    </div>
+                    <div class="tab-pane fade {% if request.user.campus == 'baiyun' %}show active{% endif %}" id="nav-campus-baiyun" role="tabpanel" aria-labelledby="nav-campus-baiyun-tab">
+                        {% if request.user.campus == 'baiyun' %}
+                        <form action="{% url 'repair:dormitory' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="campus" value="白云校区">
+                            <div class="my-3">
+                                <label for="htitle" class="form-label">标题</label>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="btitle" aria-describedby="title" name="title">
+                                    <label for="htitle" id="btitle-label">0/30</label>
+                                </div>
+                            </div>
+                            <label for="hbuilding-radio-select" class="form-label mt-3">地点</label>
+                            <div class="mb-3">
+                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group" id='bbuilding-radio-select'>
+                                    <input type="radio" class="btn-check" name="buildingradio" id="bbuildingradio1" autocomplete="off" checked value="{{ request.user.dormitoryA }}">
+                                    <label class="btn btn-outline-secondary" for="bbuildingradio1">{{ request.user.dormitoryA }}</label>
+
+                                    <input type="radio" class="btn-check" name="buildingradio" id="bbuildingradio2" autocomplete="off" value="其它">
+                                    <label class="btn btn-outline-secondary" for="bbuildingradio2">其它(请在描述栏里说明)</label>
+                                </div>
+                            </div>
+                            
+                            <label for="hlevel-radio-select" class="form-label">宿舍号</label>
+                            <div class="mb-3">
+                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group" id='bnumber-radio-select'>
+                                    <input type="radio" class="btn-check" name="dormitoryNumber" id="bnumber1" autocomplete="off" checked value="{{ request.user.dormitoryB }}">
+                                    <label class="btn btn-outline-secondary" for="bnumber1">{{ request.user.dormitoryB }}</label>
+
+                                    <input type="radio" class="btn-check" name="dormitoryNumber" id="bnumber2" autocomplete="off" value="0">
+                                    <label class="btn btn-outline-secondary" for="bnumber2">其它(请在描述栏里说明)</label>
+                                </div>
+                            </div>
+                            
+                            <label for="hlevel-radio-select" class="form-label">损害程度</label>
+                            <div class="mb-3">
+                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group" id='blevel-radio-select'>
+                                    <input type="radio" class="btn-check" name="levelradio" id="blevelradio1" autocomplete="off" checked value="低">
+                                    <label class="btn btn-outline-secondary" for="blevelradio1">低</label>
+
+                                    <input type="radio" class="btn-check" name="levelradio" id="blevelradio2" autocomplete="off" value="中">
+                                    <label class="btn btn-outline-secondary" for="blevelradio2">中</label>
+
+                                    <input type="radio" class="btn-check" name="levelradio" id="blevelradio3" autocomplete="off" value="高">
+                                    <label class="btn btn-outline-secondary" for="blevelradio3">高</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="formFileMultiple" class="form-label" >一张现场照片(可选,仅支持jpg/jpeg/png/webp格式)</label>
+                                <input class="form-control" type="file" id="bimage" name="picture">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="btext" class="form-label">描述(可选)</label>
+                                <div class="form-floating">
+                                    <textarea class="form-control" placeholder="Leave a comment here" id="btext" style="height: 100px" name="description"></textarea>
+                                    <label for="floatingTextarea2" id="btext-label">0/300</label>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="reset" class="btn btn-secondary" onclick="resetForm()">重置</button>
+                                <button type="submit" class="btn btn-primary" onclick="return bcheckNsubmit()">提交</button>
+                            </div>
+                        </form>
+                        {% else %}
+                        <form action="{% url 'repair:dormitory' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="campus" value="白云校区">
+                            <div class="my-3">
+                                <label for="btitle" class="form-label">标题</label>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="btitle" aria-describedby="title" name="title">
+                                    <label for="htitle" id="btitle-label">0/30</label>
+                                </div>
+                            </div>
+                            <label for="hbuilding-radio-select" class="form-label mt-3">地点</label>
+                            <div class="mb-3">
+                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group" id='bbuilding-radio-select'>
+                                    <input type="radio" class="btn-check" name="buildingradio" id="bbuildingradio2" autocomplete="off" value="其它" checked>
+                                    <label class="btn btn-outline-secondary" for="bbuildingradio2">其它(请在描述栏里说明)</label>
+                                </div>
+                            </div>
+                            
+                            <label for="hlevel-radio-select" class="form-label">宿舍号</label>
+                            <div class="mb-3">
+                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group" id='bnumber-radio-select'>
+                                    <input type="radio" class="btn-check" name="dormitoryNumber" id="bnumber2" autocomplete="off" value="0" checked>
+                                    <label class="btn btn-outline-secondary" for="bnumber2">其它(请在描述栏里说明)</label>
+                                </div>
+                            </div>
+                            
+                            <label for="hlevel-radio-select" class="form-label">损害程度</label>
+                            <div class="mb-3">
+                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group" id='blevel-radio-select'>
+                                    <input type="radio" class="btn-check" name="levelradio" id="blevelradio1" autocomplete="off" checked value="低">
+                                    <label class="btn btn-outline-secondary" for="blevelradio1">低</label>
+
+                                    <input type="radio" class="btn-check" name="levelradio" id="blevelradio2" autocomplete="off" value="中">
+                                    <label class="btn btn-outline-secondary" for="blevelradio2">中</label>
+
+                                    <input type="radio" class="btn-check" name="levelradio" id="blevelradio3" autocomplete="off" value="高">
+                                    <label class="btn btn-outline-secondary" for="blevelradio3">高</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="formFileMultiple" class="form-label" >一张现场照片(可选,仅支持jpg/jpeg/png/webp格式)</label>
+                                <input class="form-control" type="file" id="bimage" name="picture">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="btext" class="form-label">描述(不少于15字)</label>
+                                <div class="form-floating">
+                                    <textarea class="form-control" placeholder="Leave a comment here" id="btext" style="height: 100px" name="description"></textarea>
+                                    <label for="floatingTextarea2" id="btext-label">0/300</label>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="reset" class="btn btn-secondary" onclick="resetForm()">重置</button>
+                                <button type="submit" class="btn btn-primary" onclick="return bcheckNsubmit()">提交</button>
+                            </div>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>                  
+            </div>
+        </div>
+    </div>
+{% endblock body %}
+
+{% block js %}
+
+{% if request.user.campus == 'haizhu' %}
+    document.getElementById('htitle').addEventListener('input', function () {
+        let text_str = document.getElementById('htitle').value.split('');
+        document.getElementById('htitle-label').innerText = text_str.length + '/30'
+        if (text_str.length <= 30) {
+            document.getElementById('htitle-label').classList.remove('text-danger')
+            document.getElementById('htitle').classList.remove('is-invalid')
+        } else if (text_str.length > 30) {
+            document.getElementById('htitle-label').classList.add('text-danger')
+            document.getElementById('htitle').classList.add('is-invalid')
+        }
+    })
+    document.getElementById('btitle').addEventListener('input', function () {
+        let text_str = document.getElementById('btitle').value.split('');
+        document.getElementById('btitle-label').innerText = text_str.length + '/30'
+        if (text_str.length <= 30) {
+            document.getElementById('btitle-label').classList.remove('text-danger')
+            document.getElementById('btitle').classList.remove('is-invalid')
+        } else if (text_str.length > 30) {
+            document.getElementById('btitle-label').classList.add('text-danger')
+            document.getElementById('btitle').classList.add('is-invalid')
+        }
+    })
+    document.getElementById('htext').addEventListener('input', function () {
+        let text_str = document.getElementById('htext').value.split('');
+        document.getElementById('htext-label').innerText = text_str.length + '/300'
+        if (text_str.length <= 300) {
+            document.getElementById('htext-label').classList.remove('text-danger')
+            document.getElementById('htext').classList.remove('is-invalid')
+        } else if (text_str.length > 300) {
+            document.getElementById('htext-label').classList.add('text-danger')
+            document.getElementById('htext').classList.add('is-invalid')
+        }
+    })
+    document.getElementById('btext').addEventListener('input', function () {
+        let text_str = document.getElementById('btext').value.split('');
+        document.getElementById('btext-label').innerText = text_str.length + '/300'
+        if (text_str.length <= 300 && text_str.length >= 15) {
+            document.getElementById('btext-label').classList.remove('text-danger')
+            document.getElementById('btext').classList.remove('is-invalid')
+        } else if (text_str.length > 300 || text_str.length < 15) {
+            document.getElementById('btext-label').classList.add('text-danger')
+            document.getElementById('btext').classList.add('is-invalid')
+        }
+    })
+{% elif request.user.campus == 'baiyun' %}
+    document.getElementById('htitle').addEventListener('input', function () {
+        let text_str = document.getElementById('htitle').value.split('');
+        document.getElementById('htitle-label').innerText = text_str.length + '/30'
+        if (text_str.length <= 30) {
+            document.getElementById('htitle-label').classList.remove('text-danger')
+            document.getElementById('htitle').classList.remove('is-invalid')
+        } else if (text_str.length > 30) {
+            document.getElementById('htitle-label').classList.add('text-danger')
+            document.getElementById('htitle').classList.add('is-invalid')
+        }
+    })
+    document.getElementById('btitle').addEventListener('input', function () {
+        let text_str = document.getElementById('btitle').value.split('');
+        document.getElementById('btitle-label').innerText = text_str.length + '/30'
+        if (text_str.length <= 30) {
+            document.getElementById('btitle-label').classList.remove('text-danger')
+            document.getElementById('btitle').classList.remove('is-invalid')
+        } else if (text_str.length > 30) {
+            document.getElementById('btitle-label').classList.add('text-danger')
+            document.getElementById('btitle').classList.add('is-invalid')
+        }
+    })
+    document.getElementById('htext').addEventListener('input', function () {
+        let text_str = document.getElementById('htext').value.split('');
+        document.getElementById('htext-label').innerText = text_str.length + '/300'
+    if (text_str.length > 300 || text_str.length < 15) {
+            document.getElementById('htext-label').classList.add('text-danger')
+            document.getElementById('htext').classList.add('is-invalid')
+        } else if ((text_str.length <= 300) && (text_str.length >= 15)) {
+            document.getElementById('htext-label').classList.remove('text-danger')
+            document.getElementById('htext').classList.remove('is-invalid')
+        }
+    })
+    document.getElementById('btext').addEventListener('input', function () {
+        let text_str = document.getElementById('btext').value.split('');
+        document.getElementById('btext-label').innerText = text_str.length + '/300'
+        if (text_str.length <= 300) {
+            document.getElementById('btext-label').classList.remove('text-danger')
+            document.getElementById('btext').classList.remove('is-invalid')
+        } else if (text_str.length > 300) {
+            document.getElementById('btext-label').classList.add('text-danger')
+            document.getElementById('btext').classList.add('is-invalid')
+        }
+    })
+{% endif %}
+    let resetForm = () => {
+        document.getElementById('htitle-label').innerText = '0/30'
+        document.getElementById('htitle-label').classList.remove('text-danger')
+        document.getElementById('htitle').classList.remove('is-invalid')
+        document.getElementById('btitle-label').innerText = '0/30'
+        document.getElementById('btitle-label').classList.remove('text-danger')
+        document.getElementById('btitle').classList.remove('is-invalid')
+        document.getElementById('htext-label').innerText = '0/300'
+        document.getElementById('htext-label').classList.remove('text-danger')
+        document.getElementById('htext').classList.remove('is-invalid')
+        document.getElementById('btext-label').innerText = '0/300'
+        document.getElementById('btext-label').classList.remove('text-danger')
+        document.getElementById('btext').classList.remove('is-invalid')
+    }
+
+    let hcheckNsubmit = () => {
+
+        if (document.getElementById('htitle').className != 'form-control') {
+            return false;
+        } else if (document.getElementById('htitle').value == '') {
+            return false;
+        } else if (document.getElementById('htext').className != 'form-control') {
+            return false;
+        }
+        return true;
+    }
+    let bcheckNsubmit = () => {
+
+        if (document.getElementById('btitle').className != 'form-control') {
+            return false;
+        } else if (document.getElementById('btitle').value == '') {
+            return false;
+        } else if (document.getElementById('btext').className != 'form-control') {
+            return false;
+        }
+        return true;
+    }
+{% endblock js %}

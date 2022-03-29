@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}Document{% endblock title %}
+    </title>
+    {% comment %} Bootstrap CSS {% endcomment %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    {% comment %} <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous"> {% endcomment %}
+    {% comment %} <Bootstrap Bundle with Popper {% endcomment %}
+    <script src="{% static 'bootstrap/bootstrap.bundle.min.js' %}"></script>
+    <link rel="shortcut icon" href="{% static 'bootstrap/simon.svg' %}" type="image/x-icon" />
+    {% comment %} <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script> {% endcomment %}
+    {% block head %}{% endblock head %}
+    <style>
+        {% block css %}{% endblock css %}
+    </style>
+    {% comment %} 给url获取到的结果起别名,类似于变量赋值,以便下方if判断添加样式 {% endcomment %}
+    {% url 'index:index' as index_index %}
+    {% url 'repair:index' as repair_index %}
+    {% url 'repair:campus' as repair_campus %}
+    {% url 'repair:campuslist' as repair_campus_list %}
+    {% url 'repair:dormitory' as repair_dormitory %}
+    {% url 'repair:list_for_repair' as list_for_repair %}
+    {% url 'repair:dormitorylist' as dormitorylist %}
+    {% url 'repair:dormitory_list_for_repair' as dormitory_list_for_repair %}
+    {% url 'index:about' as about %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: transparent;">
+        <div class="container">
+            <a href="{% url 'index:index' %}" class="navbar-brand">
+                <img src="{% static 'bootstrap/simon!.png' %}">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a href="{{ index_index }}" class="nav-link {% if request.path == index_index %}active{% endif %}">首页</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {% if request.path == repair_index %}active{% elif request.path == repair_campus %}active{% elif request.path == repair_campus_list %}active{% elif request.path == repair_dormitory %}active{% elif request.path == repair_dormitory %}active{% elif request.path == list_for_repair %}active{% elif request.path == dormitorylist %}active{% elif request.path == dormitory_list_for_repair %}active{% endif %}" id="repairNavbarDropdownMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            报修
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-start" aria-labelledby="repairNavbarDropdownMenu">
+                            <li><a class="dropdown-item {% if request.path == repair_index %}active{% endif %}" href="{{ repair_index }}">报修介绍</a></li>
+                            <li><a class="dropdown-item {% if request.path == repair_campus_list %}active{% endif %}" href="{{ repair_campus_list }}">校园报修列表</a></li>
+                            {% if request.user.is_authenticated %}
+                            <li><a class="dropdown-item {% if request.path == dormitorylist %}active{% endif %}" href="{{ dormitorylist }}">宿舍报修列表</a></li>
+                            <li><a class="dropdown-item {% if request.path == repair_campus %}active{% endif %}" href="{{ repair_campus }}">校园报修</a></li>
+                            <li><a class="dropdown-item {% if request.path == repair_dormitory %}active{% endif %}" href="{{ repair_dormitory }}">宿舍报修</a></li>
+                            {% endif %}
+                            {% if request.user.repairEmployee == True %}
+                            <li><a class="dropdown-item {% if request.path == list_for_repair %}active{% endif %}" href="{{ list_for_repair }}">校园尚未维修列表</a></li>
+                            <li><a class="dropdown-item {% if request.path == dormitory_list_for_repair %}active{% endif %}" href="{{ dormitory_list_for_repair }}">宿舍尚未维修列表</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ about }}" class="nav-link {% if request.path == about %}active{% endif %}">关于</a>
+                    </li>
+                </ul>
+                
+                {% if request.user.is_authenticated %}
+                <ul class="navbar-nav ms-auto mt-10">
+                    <li class="me-md-2 d-flex p-2 bd-highlight justify-content-center align-content-center">
+                        你好!&nbsp;<a href="{% url 'user:user_info' %}" class="text-reset">{{ user.get_username }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-light me-md-2 d-flex p-2 bd-highlight justify-content-center align-content-center" href="{% url 'user:logout' %}" role="button">登出</a>
+                    </li>
+                </ul>
+                {% else %}
+                    <ul class="navbar-nav ms-auto mt-10">
+                        <li class="nav-item">
+                            <a class="btn btn-light me-md-2 d-flex p-2 bd-highlight justify-content-center align-content-center" href="{% url 'user:login' %}" role="button">登录</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary d-flex p-2 bd-highlight justify-content-center align-content-center" href="{% url 'user:registration' %}" role="button"> 注册</a>
+                        </li>
+                    </ul>
+                {% endif %}
+            </div>
+
+        </div>
+    </nav>
+
+    {% block body %}hello!{% endblock body %}
+    
+    <div class="container pt-5">
+        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+            <div class="col-md-4 d-flex align-items-center">
+                <a href="{% url 'index:index' %}" class="mb-3 me-2 mb-md-0 text-muted text-decoration-none lh-1">
+                    <img src="{% static 'bootstrap/emoji-sunglasses.svg' %}">
+                </a>
+                <span class="text-muted">© 2022 simon毕业设计</span>
+            </div>
+        
+            <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+                {% comment %} <li class="ms-3"><a class="text-muted" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#twitter"></use></svg></a></li>
+                <li class="ms-3"><a class="text-muted" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#instagram"></use></svg></a></li>
+                <li class="ms-3"><a class="text-muted" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#facebook"></use></svg></a></li> {% endcomment %}
+            </ul>
+        </footer>
+    </div>
+
+</body>
+<script>
+    {% block js %}{% endblock js %}
+</script>
+</html>

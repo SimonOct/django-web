@@ -1,0 +1,82 @@
+{% extends 'bootstrap/base_user.html' %}
+
+{% block head %}
+    {% load static %}
+    {% comment %} 引入crypto-js加密模块 {% endcomment %}
+    {% comment %} <script src="{% static 'bootstrap/crypto-js.min.js' %}"></script> {% endcomment %}
+    {% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" integrity="sha512-E8QSvWZ0eCLGk4km3hxSsNmGWbLtSCSUcewDQPQWZF6pEU8GlT8a5fF32wOl1i8ftdMhssTrF/OhyGWwonTcXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> {% endcomment %}
+{% endblock head %}
+
+{% block title %}
+    登录
+{% endblock title %}
+
+{% block css %}
+    .full {
+        width: 100%;
+        height: 100vh;
+        background-size: cover;
+        background-image: url(https://picsum.photos/1400/900/?random=10);
+    }
+    .font-style {
+        text-shadow: 0 0 1px white,
+        0 0 1px white,
+        0 0 1px white,
+        0 0 1px white,
+        0 0 1px white,
+        0 0 1px white;
+    }
+{% endblock css %}
+
+{% block body %}
+    <div class="full">
+        <div class="container h-100">
+            <div class="row justify-content-center align-content-center h-100">
+                <div class="col-12 col-md-8">
+                    {{ msg|safe|escape }}
+                    <form method="post" action="{% url 'user:login' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next_url" value="{{ next_url }}"> 
+                        <div class="mb-3">
+                          <label for="email" class="form-label font-style">邮箱/用户名</label>
+                          <input type="text" class="form-control" id="email" name="email" aria-describedby="emailHelp">
+                          <div id="emailHelp" class="form-text font-style">请输入已经验证过的账号</div>
+                        </div>
+                        <div class="mb-3">
+                          <label for="password" class="form-label font-style">密码</label>
+                          <input type="password" class="form-control" id="password" name="password">
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="rememberMe" name="rememberMe" value="True">
+                                <label class="form-check-label font-style" for="flexSwitchCheckDefault">14天内免登录</label>
+                            </div>
+                            <a class="link-secondary font-style" href="{% url 'user:forgot' %}">忘记密码?</a>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-1">
+                            <a class="btn btn-secondary me-md-2 " href="{% url 'user:registration' %}" role="button">注册</a>
+                            <button type="submit" class="btn btn-primary" onclick="return encry()">登录</button>
+                        </div>
+                      </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
+
+{% block js %}
+    let encry = () => {
+{% comment %}         
+            获取用户输入的密码
+            let parameter = document.getElementById('password').value;
+            将密码内的特殊字符转码
+            let urlDecoded = decodeURIComponent(parameter);
+            将转码后的字符串进行sha256加密，输出为base64的字符串。将base64字符串进行sha512加密，输出为16进制字符串
+            let sha256 = CryptoJS.SHA256(urlDecoded).toString(CryptoJS.enc.Base64);
+            let secret = CryptoJS.SHA512(sha256).toString(CryptoJS.enc.Hex);
+            将加密后的密码提交到服务器("value","secret");
+            document.getElementById('password').value = secret;
+ {% endcomment %}
+            return true;
+        }
+{% endblock js %}

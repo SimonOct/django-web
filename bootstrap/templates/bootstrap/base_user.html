@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}Document{% endblock title %}
+    </title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    {% comment %} <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous"> {% endcomment %}
+    {% comment %} <Bootstrap Bundle with Popper {% endcomment %}
+    <script src="{% static 'bootstrap/bootstrap.bundle.min.js' %}"></script>
+    <link rel="shortcut icon" href="{% static 'bootstrap/simon.svg' %}" type="image/x-icon" />
+    {% block head %}{% endblock head %}
+    <style>
+        {% block css %}{% endblock css %}
+    </style>
+</head>
+<body>
+    {% block body %}hello!{% endblock body %}
+</body>
+<script>
+    {% block js %}{% endblock js %}
+</script>
+</html>

@@ -1,0 +1,82 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}
+    报修列表
+{% endblock title %}
+
+
+{% block body %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8">
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <button class="nav-link {% if request.user.campus == 'haizu' %}active{% endif %}" id="nav-hall-tab" data-bs-toggle="tab" data-bs-target="#nav-hall" type="button" role="tab" aria-controls="nav-hall" aria-selected="true">海珠校区未处理报修信息</button>
+                        <button class="nav-link {% if request.user.campus == 'baiyun' %}active{% endif %}" id="nav-ball-tab" data-bs-toggle="tab" data-bs-target="#nav-ball" type="button" role="tab" aria-controls="nav-ball" aria-selected="false">白云校区未处理报修信息</button>
+                    </div>
+                </nav>
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade {% if request.user.campus == 'haizhu' %}show active{{% endif %}" id="nav-hall" role="tabpanel" aria-labelledby="nav-hall-tab">
+                    </div>
+                    <div class="tab-pane fade {% if request.user.campus == 'baiyun' %}show active{% endif %}" id="nav-ball" role="tabpanel" aria-labelledby="nav-ball">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
+
+
+{% block js %}
+    let hlist = document.getElementById("nav-hall")
+    let blist = document.getElementById("nav-ball")
+    window.onload = () => {
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', '{% url 'repair:hdormitoryforrepair' %}?hpage=1');
+        xhr.send();
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4) {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    hlist.innerHTML = xhr.response;
+                }
+            }
+        }
+        let bxhr = new XMLHttpRequest();
+        bxhr.open('GET', '{% url 'repair:bdormitoryforrepair' %}?bpage=1');
+        bxhr.send();
+        bxhr.onreadystatechange = () => {
+            if (bxhr.readyState === 4) {
+                if (bxhr.status >= 200 && xhr.status < 300) {
+                    blist.innerHTML = bxhr.response;
+                }
+            }
+        }
+    }
+    let hpagination = function (url) {
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', `${url}`);
+        xhr.send();
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4) {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    hlist.innerHTML = xhr.response;
+                }
+            }
+        }
+    }
+    let bpagination = function (url) {
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', `${url}`);
+        xhr.send();
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4) {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    blist.innerHTML = xhr.response;
+                }
+            }
+        }
+    }
+
+{% endblock js %}
+    

@@ -1,0 +1,39 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block title %}
+    关于页面
+{% endblock title %}
+
+{% block css %}
+    .kv {
+        width: 100%;
+        height: 30vh;
+        background-image: url(https://picsum.photos/1000/400/?random=10);
+        background-size: cover;
+    }
+    .kv .text {
+        text-align: center;
+    }
+
+{% endblock css %}
+
+{% block body %}
+    <div class="kv">
+        <div class="container h-100">
+            <div class="row h-100 justify-content-center align-content-center">
+                <div class="col-8 col-md-6">
+                    <div class="text text-white">
+                        <h1>关于网站</h1>
+                        <p>
+                            这是一个毕业设计,内容是设计一个校园报修的网页,含后端前端.<br>登录后和没登录能看到的报修选项不同,维修人员账号能看到的也跟普通账号有点不同.<br>
+                            前端工具有: bootstrap5.1;crypto-js;jquery-3.6.0;moment.js;bootstrap-datepicker.<br>
+                            其中bootstrap用于美化页面,crypto-js用于加密用户输入的密码(暂时没用),datepicker用于时间选择.<br>
+                            后端用的是django3.2. <br>目前这个网站用的图片都是假图,随机选中的刷新就会变不一样.
+                        </p> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
+    

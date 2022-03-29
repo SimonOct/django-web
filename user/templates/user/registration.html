@@ -1,0 +1,555 @@
+{% extends 'bootstrap/base_user.html' %}
+
+{% block head %}
+    {% load static %}
+    {% comment %} bootstrap-datepicker的样式 {% endcomment %}
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap-datepicker3.min.css' %}">
+    {% comment %} <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker3.min.css"> {% endcomment %}
+    {% comment %} 引入jQuery {% endcomment %}
+    <script src="{% static 'bootstrap/jquery-3.6.0.min.js' %}"></script>
+    {% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> {% endcomment %}
+    {% comment %} 引入moment.js {% endcomment %}
+    <script src="{% static 'bootstrap/moment.js' %}"></script>
+    {% comment %} <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script> {% endcomment %}
+    {% comment %} 引入bootstrap-datepicker插件 {% endcomment %}
+    <script src="{% static 'bootstrap/bootstrap-datepicker.min.js' %}"></script>
+    {% comment %} <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script> {% endcomment %}
+    {% comment %} 引入bootstrap-datepicker中文插件 {% endcomment %}
+    <script src="{% static 'bootstrap/bootstrap-datepicker.zh-CN.min.js' %}"></script>
+    {% comment %} <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.zh-CN.min.js"></script> {% endcomment %}
+    {% comment %} 引入crypto-js加密模块 {% endcomment %}
+    {% comment %} <script src="{% static 'bootstrap/crypto-js.min.js' %}"></script> {% endcomment %}
+    {% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" integrity="sha512-E8QSvWZ0eCLGk4km3hxSsNmGWbLtSCSUcewDQPQWZF6pEU8GlT8a5fF32wOl1i8ftdMhssTrF/OhyGWwonTcXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> {% endcomment %}
+{% endblock head %}
+
+{% block title %}
+    注册
+{% endblock title %}
+
+{% block css %}
+    body {
+        background-image: url('https://picsum.photos/2000/1000/?random=10');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    .text-danger {
+        text-shadow: 0 0 1px white,
+        0 0 1px white,
+        0 0 1px white,
+        0 0 1px white,
+        0 0 1px red,
+        0 0 1px white;
+    }
+    .text-success {
+        text-shadow: 0 0 1px white,
+        0 0 1px white,
+        0 0 1px white,
+        0 0 1px white,
+        0 0 1px green,
+        0 0 1px white;
+    }
+    h1,#userPassword,#userName,#email1 {
+        text-shadow: 0 0 1px white,
+        0 0 1px white,
+        0 0 1px white,
+        0 0 1px white,
+        0 0 1px white,
+        0 0 1px white;
+    }
+
+{% endblock css %}
+
+{% block body %}
+    <div class="container">
+        <div class="row justify-content-center my-5">
+            <form action="{% url 'user:registration' %}" method="post" class='col-12 col-md-7 col-lg-5 needs-validation' novalidate>
+                <h1>用户注册</h1>
+                {% csrf_token %}
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="email" name="email" placeholder>
+                    <label for="email" class="form-label">邮箱地址</label>
+                    <div class="valid-feedback" id="duplicated"></div>
+                    <div id="emailTips" class="form-text"></div>
+                    <div id='email1' class="form-text">注册成功后会发送一封验证邮箱，只有验证成功的账号能登录</div>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="user_name" name="user_name" placeholder>
+                    <label for="user_name">用户名</label>
+                    <div id="usernameTips" class="form-text"></div>
+                    <div id="userName" class="form-text">用户名长度范围为1~15，并且不能含有空格不能重复。<br>注意，一个emoji相当于两个字</div>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="user_password" name="user_password" placeholder>
+                    <label for="user_password" class="form-label">密码</label>
+                    <div id="userPassword" class="form-text">密码长度应在6位及以上</div>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="user_password_checking" name="user_password_checking" placeholder>
+                    <label for="user_password_checking" class="form-label">确认密码</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="user_registration_to_school" name="user_registration_to_school" placeholder readonly>
+                    <label for="user_registration_to_school" class="form-label">选择入学年份</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <select class="form-select" id="campus" name="campus" placeholder onchange='changeDormitoryA()'>
+                        <option selected value="1">请选择</option>
+                        <option value="haizhu">海珠校区</option>
+                        <option value="baiyun">白云校区</option>
+                    </select>
+                    <label for="campus">所属校区</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <select class="form-select" id="dormitoryA" name="dormitoryA" placeholder onchange='changeDormitoryB()' data-bs-toggle="tooltip" data-bs-placement="top" title="如果无内容出现,请点击重置按钮重新输入">
+                    </select>
+                    <label for="dormitoryA">栋</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <select class="form-select" id="dormitoryB" name="dormitoryB" placeholder>
+                    </select>
+                    <label for="dormitoryB">宿舍号</label>
+                </div>
+                <div class="form-floating my-3">
+                    <select class="form-select" id="floatingSelect" name="user_sex" placeholder>
+                        <option selected>保密</option>
+                        <option>男</option>
+                        <option>女</option>
+                        <option>Others</option>
+                    </select>
+                    <label for="floatingSelect">(可选)请选择性别</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="user_birthday" name="user_birthday" placeholder readonly>
+                    <label for="user_birthday" class="form-label">(可选)生日</label>
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="reset" class="btn btn-secondary" onclick="resetForm()" data-bs-toggle="tooltip" data-bs-placement="top" title="将一切重置">重置</button>
+                    <button type="submit" class="btn btn-primary" onclick="return checkNsubmit()" data-bs-toggle="tooltip" data-bs-placement="top" title="如果遇到提交无响应的情况,尝试点击重置按钮重新输入">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock body %}
+
+
+{% block js %}
+    {% comment %} 启用tooltips {% endcomment %}
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+    {% comment %} 内容验证 {% endcomment %}
+    {% comment %} 找到注册的表单 {% endcomment %}
+    let registrationForm = document.querySelector('.needs-validation');
+    {% comment %} 接受需要验证的栏目 {% endcomment %}
+    let valElements = {
+        email: document.getElementById('email'),
+        emailTips: document.getElementById('emailTips'),
+        btngetcode: document.getElementById('btngetcode'),
+        username: document.getElementById('user_name'),
+        usernameTips: document.getElementById('usernameTips'),
+        password: document.getElementById('user_password'),
+        password_check: document.getElementById('user_password_checking'),
+        reg_year: document.getElementById('user_registration_to_school'),
+        campus: document.getElementById('campus'),
+        dormitoryA: document.getElementById('dormitoryA'),
+        dormitoryB: document.getElementById('dormitoryB')
+    }
+    {% comment %} 给入学时间设定默认值，默认为今年 {% endcomment %}
+    valElements.reg_year.setAttribute('value', moment().format('YYYY'));
+    {% comment %} 日期选择器 {% endcomment %}
+    $(document).ready(function(){
+        let nowDate = new Date();
+
+        $("#user_registration_to_school").datepicker({
+        language: "zh-CN",
+        format: "yyyy",
+        {% comment %} 只能选择年份 {% endcomment %}
+        viewMode: "years", 
+        minViewMode: "years",
+        autoclose: true,
+        startDate: '1927',
+        {% comment %} 限制选择的上限 {% endcomment %}
+        endDate: moment().format('YYYY')
+        }).datepicker("setDate", moment().format('YYYY'));
+        $("#user_birthday").datepicker({
+            language: 'zh-CN',
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            startDate: '1900-01-01',
+            endDate: moment().format('YYYY-MM-DD')
+        })
+    })
+    {% comment %} ajax {% endcomment %}
+    {% comment %} 检查邮箱是否有重复 {% endcomment %}
+    let check_duplicate = () => {
+        let xmlhttp;
+        {% comment %} 接受输入框内的值,然后将其转码以便传输 {% endcomment %}
+        let email = valElements.email.value;
+        email = encodeURIComponent(email);
+        {% comment %} ajax {% endcomment %}
+        if (window.XMLHttpRequest)
+        {
+          {% comment %} IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码 {% endcomment %}
+          xmlhttp=new XMLHttpRequest();
+        }
+        else
+        {
+          {% comment %} IE6, IE5 浏览器执行代码 {% endcomment %}
+          xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange=function()
+        {
+          if (xmlhttp.readyState == 4 && xmlhttp.status == 404) {
+            valElements.emailTips.innerText = '邮箱已被注册'
+            valElements.email.classList.add('is-invalid');
+            valElements.emailTips.classList.add('text-danger')
+          } else if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+            valElements.email.classList.add('is-valid');
+            valElements.emailTips.innerText = '该邮箱可以注册'
+            valElements.email.classList.remove('is-invalid');
+            valElements.emailTips.classList.remove('text-danger')
+            valElements.emailTips.classList.add('text-success')
+          }
+        }
+        xmlhttp.open("GET","{% url 'user:isduplicate' %}?email=" + email,true);
+        xmlhttp.send()
+    }
+    {% comment %} 检查用户名是否有重复 {% endcomment %}
+    let check_username = () => {
+        let xmlhttp;
+        {% comment %} 接受输入框内的值,然后将其转码以便传输 {% endcomment %}
+        let username = valElements.username.value;
+        username = encodeURIComponent(username);
+        {% comment %} ajax {% endcomment %}
+        if (window.XMLHttpRequest)
+        {
+            {% comment %} IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码 {% endcomment %}
+            xmlhttp=new XMLHttpRequest();
+        }
+        else
+        {
+            {% comment %} IE6, IE5 浏览器执行代码 {% endcomment %}
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange=function()
+        {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 404) {
+            valElements.usernameTips.innerText = '用户名已被注册'
+            valElements.username.classList.add('is-invalid');
+            valElements.usernameTips.classList.add('text-danger')
+            } else if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+            valElements.username.classList.add('is-valid');
+            valElements.usernameTips.innerText = '该用户名可以注册'
+            valElements.username.classList.remove('is-invalid');
+            valElements.usernameTips.classList.remove('text-danger')
+            valElements.usernameTips.classList.add('text-success')
+            }
+        }
+        xmlhttp.open("GET","{% url 'user:isduplicate' %}?username=" + username,true);
+        xmlhttp.send();
+    }
+    {% comment %} 当用户选择了相应的校区后，生成对应的宿舍楼号，此处海珠比白云多两个编号 {% endcomment %}
+    let changeDormitoryA = function () {
+        let selectVal = valElements.campus.value;
+        let A = valElements.dormitoryA;
+        let letter = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+        while (A.hasChildNodes()) {
+            A.removeChild(A.lastChild);
+        }
+        switch(selectVal) {
+            default : break;
+            case "haizhu": (function () {
+                let t = document.createTextNode('请选择')
+                let l = document.createElement('option')
+                l.appendChild(t)
+                A.appendChild(l)
+                for (let i = 0; i < letter.length; i++) {
+                    let text = document.createTextNode(letter[i])
+                    let label = document.createElement('option')
+                    label.appendChild(text)
+                    A.appendChild(label)
+                }
+            })();break;
+            case "baiyun": (function () {
+                let t = document.createTextNode('请选择')
+                let l = document.createElement('option')
+                l.appendChild(t)
+                A.appendChild(l)
+                for (let i = 0; i < letter.length - 2; i++) {
+                    let text = document.createTextNode(letter[i])
+                    let label = document.createElement('option')
+                    label.appendChild(text)
+                    A.appendChild(label)
+                }
+            })();break;
+        }
+    }
+    {% comment %} 当选择了所属宿舍楼后，判断处于哪个校区，添加宿舍号 {% endcomment %}
+    let changeDormitoryB = function () {
+        let selectVal = valElements.dormitoryA.value;
+        let A = valElements.dormitoryA;
+        let B = valElements.dormitoryB;
+        while (B.hasChildNodes()) {
+            B.removeChild(B.lastChild);
+        }
+        if (A.value == '请选择') {
+            return
+        } else {
+            if (valElements.campus.value == 'haizhu') {
+                let t = document.createTextNode('请选择')
+                let l = document.createElement('option')
+                l.appendChild(t)
+                B.appendChild(l)
+                for ( let i = 0; i < 60; i++) {
+                    let text = ''
+                    if (i < 10) {
+                        text = document.createTextNode('10' + i)
+                    } else {
+                        text = document.createTextNode('1' + i)
+                    }
+                    
+                    let label = document.createElement('option')
+                    label.appendChild(text)
+                    B.appendChild(label)
+                }
+            } else if (valElements.campus.value == 'baiyun') {
+                for ( let i = 0; i < 60; i++) {
+                    let text = ''
+                    if (i < 10) {
+                        text = document.createTextNode('10' + i)
+                    } else {
+                        text = document.createTextNode('1' + i)
+                    }
+                    
+                    let label = document.createElement('option')
+                    label.appendChild(text)
+                    B.appendChild(label)
+                }
+                for ( let i = 0; i < 20; i++) {
+                    let text = ''
+                    if (i < 10) {
+                        text = document.createTextNode('20' + i)
+                    } else {
+                        text = document.createTextNode('2' + i)
+                    }
+                    
+                    let label = document.createElement('option')
+                    label.appendChild(text)
+                    B.appendChild(label)
+                }
+            }
+        }
+    }
+    {% comment %} 验证邮箱格式是否正确 {% endcomment %}
+    valElements.email.addEventListener('blur', function () {
+        let reg = /^([a-zA-Z]|[0-9])(\w|\-|\.)+@[a-zA-Z0-9]+(\.[a-zA-Z]{2,6}$)|(\.([a-zA-Z]{2,6})+\.([a-zA-Z]{2})$)/;
+        if(reg.test(valElements.email.value)) {
+            valElements.email.classList.remove('is-invalid');
+        } else {
+            valElements.emailTips.innerText = '格式有误'
+            valElements.email.classList.add('is-invalid');
+            valElements.emailTips.classList.add('text-danger')
+            return
+        }
+        check_duplicate()
+    })
+
+    {% comment %} 验证用户名格式是否正确 {% endcomment %}
+    valElements.username.addEventListener('blur', function () {
+        {% comment %} 添加一个验证成功的样式 {% endcomment %}
+        valElements.username.classList.add('is-valid');
+        {% comment %} 判断用户名是否含有空格 {% endcomment %}
+        let username_str = valElements.username.value.split('');
+        for (let i = 0; i < username_str.length; i++) {
+            if (username_str[i].trim() == '' || username_str[i].trim() == null) {
+                {% comment %} 添加一个验证失败的样式 {% endcomment %}
+                valElements.username.classList.add('is-invalid');
+                return
+            }
+            {% comment %} 循环到最后一次时，删除is-invalid样式，虽然不用if直接写也可以，但是还是以防万一 {% endcomment %}
+            if (i == username_str.length - 1) {
+                valElements.username.classList.remove('is-invalid');
+            }
+        }
+        {% comment %} 判断密码是否超过15个字符串，添加样式 {% endcomment %}
+        if (username_str.length > 15) {
+            valElements.username.classList.add('is-invalid');
+            return
+        }
+        if (!username_str.length) {
+            valElements.username.classList.add('is-invalid');
+            valElements.usernameTips.innerText = ''
+            valElements.usernameTips.classList.remove('text-danger')
+            valElements.usernameTips.classList.remove('text-success')
+            return
+        }
+        check_username()
+    })
+
+    valElements.password.addEventListener('input', function () {
+        valElements.password.classList.add('is-valid');
+        let password_str = valElements.password.value.split('');
+        let password_str1 = valElements.password.value;
+        let password_check_str = valElements.password_check.value;
+        {% comment %} 判断密码是否少于6个字符串，添加样式 {% endcomment %}
+        if (password_str.length < 6) {
+            valElements.password.classList.add('is-invalid');
+        } else if (!password_str.length) {
+            valElements.password.classList.add('is-invalid');
+            {% comment %} 检查确认密码处是否与密码栏的相等，添加样式 {% endcomment %}
+        } else if (password_check_str !== password_str1) {
+            valElements.password_check.classList.add('is-invalid');
+            valElements.password.classList.remove('is-invalid');
+        } else if (password_check_str == password_str1){
+            valElements.password_check.classList.remove('is-invalid');
+            valElements.password.classList.remove('is-invalid');
+        }
+    })
+
+    valElements.password_check.addEventListener('input', function () {
+        valElements.password_check.classList.add('is-valid');
+        let password_str = valElements.password.value;
+        let password_check_str = valElements.password_check.value;
+        {% comment %} 判断内容是否与密码栏相等，添加样式 {% endcomment %}
+        if (password_check_str !== password_str) {
+            valElements.password_check.classList.add('is-invalid');
+        } else if (!password_check_str.length) {
+            valElements.password_check.classList.add('is-invalid');
+        } else {
+            valElements.password_check.classList.remove('is-invalid');
+        }
+    })
+    {% comment %} 判断是否选择了校区，添加样式 {% endcomment %}
+    valElements.campus.addEventListener('click', function () {
+        valElements.campus.classList.add('is-valid')
+        let campus = valElements.campus.value;
+        if (campus == 0) {
+            valElements.campus.classList.add('is-invalid');
+        } else if (campus == 'haizhu' || campus == 'baiyun') {
+            valElements.campus.classList.remove('is-invalid');
+        } else {
+            valElements.campus.classList.add('is-invalid');
+        }
+    })
+    {% comment %} 判断是否选择了宿舍楼，添加样式 {% endcomment %}
+    valElements.dormitoryA.addEventListener('click', function () {
+        valElements.dormitoryA.classList.add('is-valid')
+        let dormitoryA = valElements.dormitoryA.value;
+        if (dormitoryA == '请选择') {
+            valElements.dormitoryA.classList.add('is-invalid');
+        } else if (!dormitoryA) {
+            valElements.dormitoryA.classList.add('is-invalid');
+        } else {
+            valElements.dormitoryA.classList.remove('is-invalid');
+        }
+    })
+    {% comment %} 判断是否选择了宿舍号，添加样式 {% endcomment %}
+    valElements.dormitoryB.addEventListener('click', function () {
+        valElements.dormitoryB.classList.add('is-valid')
+        let dormitoryB = valElements.dormitoryB.value;
+        if (dormitoryB == '请选择') {
+            valElements.dormitoryB.classList.add('is-invalid');
+        } else if (!dormitoryB) {
+            valElements.dormitoryB.classList.add('is-invalid');
+        } else {
+            valElements.dormitoryB.classList.remove('is-invalid');
+        }
+    })
+
+
+    let resetForm = () => {
+        valElements.emailTips.innerText = ''
+        valElements.emailTips.classList.remove('text-danger')
+        valElements.emailTips.classList.remove('text-success')
+        valElements.usernameTips.innerText = ''
+        valElements.usernameTips.classList.remove('text-danger')
+        valElements.usernameTips.classList.remove('text-success')
+        {% comment %} 清除所有验证的样式 {% endcomment %}
+        valElements.email.classList.remove('is-valid');
+        valElements.username.classList.remove('is-valid');
+        valElements.password.classList.remove('is-valid');
+        valElements.password_check.classList.remove('is-valid');
+        valElements.campus.classList.remove('is-valid');
+        valElements.email.classList.remove('is-invalid');
+        valElements.username.classList.remove('is-invalid');
+        valElements.password.classList.remove('is-invalid');
+        valElements.password_check.classList.remove('is-invalid');
+        valElements.campus.classList.remove('is-invalid');
+        valElements.dormitoryA.classList.remove('is-invalid');
+        valElements.dormitoryB.classList.remove('is-invalid');
+        {% comment %} 清除js添加的宿舍号和宿舍楼编号 {% endcomment %}
+        let A = valElements.dormitoryA;
+        let B = valElements.dormitoryB;
+        while (A.hasChildNodes()) {
+            A.removeChild(A.lastChild);
+        }
+        while (B.hasChildNodes()) {
+            B.removeChild(B.lastChild);
+        }
+
+    }
+
+    let checkNsubmit = () => {
+        if (!valElements.username.value.length){
+            valElements.username.classList.add('is-invalid');
+            return false;
+        }
+        {% comment %} 检查入学年份是否为空 {% endcomment %}
+        if (!valElements.reg_year.value.length){
+            valElements.reg_year.classList.add('is-invalid');
+            return false;
+        } else {
+            valElements.reg_year.classList.remove('is-invalid');
+        }
+        {% comment %} 检查是否选择了校区 {% endcomment %}
+        if (valElements.campus.value == 0){
+            valElements.campus.classList.add('is-invalid');
+            return false;
+        }
+        {% comment %} 检查是否选择了宿舍号 {% endcomment %}
+        if (valElements.dormitoryA.value == '请选择'){
+            valElements.dormitoryA.classList.add('is-invalid');
+            return false;
+        } else if (!valElements.dormitoryA.value) {
+            valElements.dormitoryA.classList.add('is-invalid');
+            return false;
+        } else {
+            valElements.dormitoryA.classList.remove('is-invalid');
+        }
+        if (valElements.dormitoryB.value == '请选择'){
+            valElements.dormitoryB.classList.add('is-invalid');
+            return false;
+        } else if (!valElements.dormitoryB.value) {
+            valElements.dormitoryB.classList.add('is-invalid');
+            return false;
+        } else {
+            valElements.dormitoryB.classList.remove('is-invalid');
+        }
+        {% comment %} 检查需要检查的项目是否已经拥有is-valid，然后计数。防止填上值后刷新页面，值还留存在输入框内，但是没有is-valid样式的情况 {% endcomment %}
+        let search_valid = document.querySelectorAll('.is-valid');
+        let valid_count = Array.prototype.slice.call(search_valid).length;
+
+        {% comment %} 查找全局是否存在一个is-invalid样式，如果没有，变量invalid的值为空；如果有，则返回一个false {% endcomment %}
+        let invalid = document.querySelector('.is-invalid');
+        if (invalid) {
+            return false;
+        } else if (valid_count == 7) {
+{% comment %} 
+            获取用户输入的密码
+            let parameter = valElements.password.value;
+            将密码内的特殊字符转码
+            let urlDecoded = decodeURIComponent(parameter);
+            将转码后的字符串进行sha256加密，输出为base64的字符串。将base64字符串进行sha512加密，输出为16进制字符串
+            let sha256 = CryptoJS.SHA256(urlDecoded).toString(CryptoJS.enc.Base64);
+            let secret = CryptoJS.SHA512(sha256).toString(CryptoJS.enc.Hex);
+            将加密后的密码提交到服务器("value","secret");
+            valElements.password.value = secret;
+ {% endcomment %}
+            return true;
+        }
+
+        return false;
+    }
+{% endblock js %}

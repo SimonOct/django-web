@@ -1,0 +1,48 @@
+{% extends 'bootstrap/base_user.html' %}
+
+{% block title %}
+    找回密码
+{% endblock title %}
+
+{% block css %}
+    .full {
+        width: 100%;
+        height: 100vh;
+        background-size: cover;
+        background-image: url(https://picsum.photos/1400/900/?random=10);
+    }
+    .font-style {
+        text-shadow: 0 0 1px white,
+        0 0 1px white,
+        0 0 1px white,
+        0 0 1px white,
+        0 0 1px white,
+        0 0 1px white;
+    }
+{% endblock css %}
+
+
+{% block body %}
+    <div class="full">
+        <div class="container h-100">
+            <div class="row justify-content-center align-content-center h-100">
+                <div class="col-12 col-md-8">
+                    <form method="post" action="{% url 'user:forgot' %}">
+                        {% csrf_token %}
+                        {{ msg|safe|escape }}
+                        <div class="mb-3">
+                            <label for="email" class="form-label font-style">找回密码</label>
+                            <input type="text" class="form-control" id="email" name="email" aria-describedby="emailHelp">
+                            <div id="emailHelp" class="form-text font-style">请输入相应的邮箱地址</div>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-1">
+                            <a href="{% url 'index:index' %}" class="btn btn-secondary">返回首页</a>
+                            <button type="submit" class="btn btn-primary">发送验证码</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
+    

@@ -1,0 +1,85 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block title %}
+    宿舍报修信息id：{{ detailed.id }}
+{% endblock title %}
+
+{% block css %}
+    img {
+        width: 100%;
+    }
+{% endblock css %}
+
+{% block body %}
+    <div class="container pt-3">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8">
+                
+                {% if detailed.done == True %}
+                <div class="alert alert-success" role="alert">
+                    已维修！
+                </div>
+                {% else %}
+                <div class="alert alert-warning" role="alert">
+                    维修中或等待维修...
+                </div>
+                {% endif %}
+                    
+                <h2>{{ detailed.campus }}</h2><br>
+                <h3>地点：{{ detailed.buldding_name }}栋{{ detailed.dormitory_number}}号</h3>
+                <br>
+                <h3>损害程度：{{ detailed.levelradio }}</h3>
+                <br>
+                <h3>标题：{{ detailed.title }}</h3>
+                <br>
+                <p>
+                    <h3>描述：</h3><br>
+                    {% if detailed.description == '' %}
+                    无
+                    {% else %}
+                    {{ detailed.description }}
+                    {% endif %}
+                </p>
+                <br>
+                <p>
+                    <h3>图片：</h3><br>
+                    {% if detailed.picture == '' %}
+                    无
+                    {% else %}
+                    <img src="/media/{{ detailed.picture }}" class="img-fluid">
+                    {% endif %}
+                </p>
+                
+                {% if request.user.repairEmployee == True and detailed.done == False %}
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        已维修
+                    </button>
+                </div>
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                            是否已经维修完毕？
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                                <form action="{% url 'repair:dormitorylist' %}{{ detailed.id }}" method="post">
+                                    {% csrf_token %}
+                                    <input type="submit" class="btn btn-primary" value="已修复">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                    
+            </div>
+        </div>
+    </div>
+{% endblock body %}

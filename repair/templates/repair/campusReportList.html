@@ -1,0 +1,151 @@
+{% extends 'bootstrap/base.html' %}
+
+
+{% block title %}
+    报修列表
+{% endblock title %}
+
+
+{% block body %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8">
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <button class="nav-link {% if request.user.campus == 'haizu' %}active{% else %}active{% endif %}" id="nav-hall-tab" data-bs-toggle="tab" data-bs-target="#nav-hall" type="button" role="tab" aria-controls="nav-hall" aria-selected="true">海珠校区报修信息</button>
+                        <button class="nav-link {% if request.user.campus == 'baiyun' %}active{% endif %}" id="nav-ball-tab" data-bs-toggle="tab" data-bs-target="#nav-ball" type="button" role="tab" aria-controls="nav-ball" aria-selected="false">白云校区报修信息</button>
+                    </div>
+                </nav>
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade {% if request.user.campus == 'None' %}show active{% elif request.user.campus == 'haizhu' %}show active{% else %}show active{% endif %}" id="nav-hall" role="tabpanel" aria-labelledby="nav-hall-tab">
+                        <div class="list-group">
+                            {% for list in c_hcampuslist_page %}                               
+                            <a href="{{ list.id}}" class="list-group-item list-group-item-action">
+                                {% if list.levelradio == '低' %}
+                                <span class="badge bg-secondary">{{ list.levelradio }}</span>
+                                {% elif list.levelradio == '中' %}
+                                <span class="badge bg-warning text-dark">{{ list.levelradio }}</span>
+                                {% elif list.levelradio == '高' %}
+                                <span class="badge bg-danger">{{ list.levelradio }}</span>
+                                {% endif %}
+
+                                {% if list.done == False %}
+                                待处理🚗<br>
+                                {% elif list.done == Ture %}
+                                ✔<br>
+                                {% endif %}
+                                标题：{{ list.title }}<br>
+                                地点：{{ list.buldding_name }}<br>
+                                提交日期：{{ list.date_added }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-end">
+                                
+                                {% if c_hcampuslist_page.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{% url 'repair:campuslist' %}?hpage={{ c_hcampuslist_page.previous_page_number }}">上一页</a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link">上一页</a>
+                                </li>
+                                {% endif %}
+                                
+                                {% for p_num in p_hcampuslist.page_range %}
+                                
+                                    {% if p_num == c_hcampuslist_page.number %}
+                                    <li class="page-item disabled">
+                                        <a class="page-link">{{ p_num }}</a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item"><a class="page-link" href="{% url 'repair:campuslist' %}?hpage={{ p_num }}">{{ p_num }}</a></li>
+                                    {% endif %}
+
+                                {% endfor %}
+                                    
+                                {% if c_hcampuslist_page.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{% url 'repair:campuslist' %}?hpage={{ c_hcampuslist_page.next_page_number }}">下一页</a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link">下一页</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    <div class="tab-pane fade {% if request.user.campus == 'baiyun' %}show active{% endif %}" id="nav-ball" role="tabpanel" aria-labelledby="nav-ball">
+                        <div class="list-group">
+                            {% for list in c_bcampuslist_page %}
+                            <a href="{{ list.id}}" class="list-group-item list-group-item-action">
+                                {% if list.levelradio == '低' %}
+                                <span class="badge bg-secondary">{{ list.levelradio }}</span>
+                                {% elif list.levelradio == '中' %}
+                                <span class="badge bg-warning text-dark">{{ list.levelradio }}</span>
+                                {% elif list.levelradio == '高' %}
+                                <span class="badge bg-danger">{{ list.levelradio }}</span>
+                                {% endif %}
+
+                                {% if list.done == False %}
+                                待处理🚗<br>
+                                {% elif list.done == Ture %}
+                                ✔<br>
+                                {% endif %}
+                                标题：{{ list.title }}<br>
+                                地点：{{ list.buldding_name }}<br>
+                                提交日期：{{ list.date_added }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-end">
+                                
+                                {% if c_bcampuslist_page.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{% url 'repair:campuslist' %}?bpage={{ c_bcampuslist_page.previous_page_number }}">上一页</a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link">上一页</a>
+                                </li>
+                                {% endif %}
+                                
+                                {% for p_num1 in p_bcampuslist.page_range %}
+                                
+                                    {% if p_num1 == c_bcampuslist_page.number %}
+                                    <li class="page-item disabled">
+                                        <a class="page-link">{{ p_num1 }}</a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item"><a class="page-link" href="{% url 'repair:campuslist' %}?bpage={{ p_num1 }}">{{ p_num1 }}</a></li>
+                                    {% endif %}
+
+                                {% endfor %}
+                                    
+                                {% if c_bcampuslist_page.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{% url 'repair:campuslist' %}?bpage={{ c_bcampuslist_page.next_page_number }}">下一页</a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link">下一页</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+
+                    </div>
+                </div>                  
+            </div>
+        </div>
+    </div>
+{% endblock body %}
+
+
+{% block js %}
+
+{% endblock js %}
+    
